@@ -41,6 +41,7 @@ model User {
   address      Address?
   refreshToken String?
   accessToken  String?
+  carts        Cart[]   @relation("UserCarts")
 }
 
 model Product {
@@ -54,6 +55,7 @@ model Product {
   isbn      String?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  carts     Cart[]     @relation("CartProducts")
   purchases Purchase[]
 }
 
@@ -64,4 +66,13 @@ model Purchase {
   product     Product  @relation(fields: [productId], references: [id])
   productId   Int
   createdAt   DateTime @default(now())
+}
+
+model Cart {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  userId    String
+  products  Product[] @relation("CartProducts")
+  users     User[]    @relation("UserCarts")
 }

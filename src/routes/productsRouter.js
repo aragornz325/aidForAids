@@ -22,6 +22,8 @@ router.post(
 );
 
 router.get("/", productsController.getProducts);
+
+router.post("/carts/:id", productsController.createCartByUserId);
 router.get("/:id", productsController.getProductById);
 router.patch(
   "/:id",

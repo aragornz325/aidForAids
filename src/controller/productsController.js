@@ -60,6 +60,20 @@ class ProductsController {
       next(error);
     }
   }
+
+  async createCartByUserId(req, res, next) {
+    try {
+      const id = req.params.id;
+      const productsIds = req.body.products;
+      const response = await productsServices.createCartByUserId(
+        id,
+        productsIds
+      );
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = ProductsController;
