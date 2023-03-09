@@ -14,7 +14,11 @@ class UserRepository {
 
   /// metodo para obtener todos los usuarios de la db
   async getUsers() {
-    return await prisma.User.findMany();
+    return await prisma.User.findMany({
+      include: {
+        address: true,
+      },
+    });
   }
 
   /// metodo para obtener un usuario por id
@@ -23,6 +27,9 @@ class UserRepository {
     return await prisma.User.findUnique({
       where: {
         id: id,
+      },
+      include: {
+        address: true,
       },
     });
   }
@@ -48,16 +55,48 @@ class UserRepository {
     });
   }
 
-  async updateUserAddress(id, address) {
-    const user = await this.getUserById(userId);
+  async createOrUpdateAddress(userId, addressData) {
+    const user = await prisma.User.findUnique({ where: { id: userId } });
+
     if (!user) {
-      throw new Error(`User with ID ${userId} not found`);
+      throw new Error(`User with id ${userId} not found`);
     }
 
-    const updatedUser = await this.prisma.user.update({
-      where: { id: userId },
-      data: { address: { update: address } },
+    const { street, number, city, postalCode, state, country } = addressData;
+
+    const address = await prisma.Address.upsert({
+      where: { id: user.address?.id || "" },
+      update: {
+        street,
+        number,
+        city,
+        postalCode,
+        state,
+        country,
+        updatedAt: new Date(),
+      },
+      create: {
+        street,
+        number,
+        city,
+        postalCode,
+        state,
+        country,
+        createdAt: new Date(),
+      },
     });
+
+    const updatedUser = await prisma.User.update({
+      where: { id: userId },
+      data: {
+        address: {
+          connect: { id: address.id },
+        },
+        updatedAt: new Date(),
+      },
+    });
+
+    return updatedUser;
   }
 
   async getUserByEmail(email) {
@@ -71,6 +110,13 @@ class UserRepository {
     return await prisma.User.update({
       where: { id },
       data: { refreshToken, accessToken },
+    });
+  }
+
+  async updateProfile(id, profile) {
+    return await prisma.User.update({
+      where: { id },
+      data: { profile },
     });
   }
 }

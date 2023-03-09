@@ -1,22 +1,25 @@
 const prisma = require("../../db");
 
-const { Product } = require("../../db");
+const { Products } = require("../../db");
 
 class ProductsRepository {
   async createProduct(data) {
+    const price = parseFloat(data.price);
+    const stock = parseInt(data.stock);
+
     const product = await prisma.Product.create({
-      data,
+      data: { ...data, price, stock },
     });
     return product;
   }
 
   async getProducts() {
-    const products = await Product.findMany();
+    const products = await prisma.Product.findMany();
     return products;
   }
 
   async getProductById(id) {
-    const product = await Product.findUnique({
+    const product = await prisma.Product.findUnique({
       where: {
         id,
       },
@@ -25,7 +28,7 @@ class ProductsRepository {
   }
 
   async updateProductById(id, data) {
-    const product = await Product.update({
+    const product = await prisma.Product.update({
       where: {
         id,
       },
@@ -37,7 +40,7 @@ class ProductsRepository {
   }
 
   async deleteProductById(id) {
-    const product = await Product.delete({
+    const product = await prisma.Product.delete({
       where: {
         id,
       },

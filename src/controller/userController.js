@@ -37,9 +37,9 @@ class UserController {
 
   ///controlador para actualizar la direccion del usuario
 
-  async updateUserAddress(req, res, next) {
+  async createOrUpdateAddress(req, res, next) {
     try {
-      const response = await userServices.updateUserAddress(
+      const response = await userServices.createOrUpdateAddress(
         req.params.id,
         req.body
       );
@@ -62,6 +62,30 @@ class UserController {
   async deleteUser(req, res, next) {
     try {
       const response = await userServices.deleteUser(req.params.id);
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /// esta funcion recibe un id por parametro y lo envia al servicio
+  /// recibe la address por body
+  async createAddress(req, res, next) {
+    const id = req.params.id;
+    const payload = req.body;
+    try {
+      const response = await userServices.createAddress(id, payload);
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateProfile(req, res, next) {
+    const id = req.params.id;
+    const payload = req.body;
+    try {
+      const response = await userServices.updateProfile(id, payload);
       res.status(200).json(response);
     } catch (error) {
       next(error);

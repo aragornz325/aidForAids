@@ -50,7 +50,7 @@ class UserService {
   }
 
   async updateUserAddress(id, adress) {
-    return await userRepository.updateUserAddress(id, Address);
+    return await userRepository.updateUserAddress(id, adress);
   }
 
   async singInUser(user) {
@@ -76,6 +76,16 @@ class UserService {
     } else {
       return { error: "Usuario no encontrado" };
     }
+  }
+
+  async createOrUpdateAddress(id, address) {
+    const response = await userRepository.createOrUpdateAddress(id, address);
+    return response;
+  }
+
+  async updateProfile(id, user) {
+    const response = await userRepository.updateProfile(id, user);
+    return response;
   }
 }
 

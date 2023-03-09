@@ -1,4 +1,5 @@
 const boom = require("@hapi/boom");
+const jwt = require("jsonwebtoken");
 
 const { config } = require("../config/config");
 
@@ -17,13 +18,13 @@ async function isAuthenticated(req, res, next) {
   }
   const token = split[1];
   try {
-    const decodedToken = await getAuth().verifyIdToken(token);
+    const decodedToken = jwt.decode(token);
     res.locals = {
       ...res.locals,
-      uid: decodedToken.uid,
+      uid: decodedToken.id,
       role: decodedToken.role,
-      email: decodedToken.email,
     };
+
     return next();
   } catch (error) {
     next(boom.unauthorized("unauthorized / invalid token"));
@@ -34,10 +35,11 @@ function isAuthorized({ hasRole, allowSameUser }) {
   return (req, res, next) => {
     const { role, uid } = res.locals;
     const id = req.headers["x-user-id"];
+
     if (allowSameUser && id && uid === id) {
       return next();
     }
-    if (hasRole.includes(...role)) {
+    if (hasRole.includes(role)) {
       next();
     } else {
       next(boom.unauthorized("unauthorized / no role o allow same user"));
